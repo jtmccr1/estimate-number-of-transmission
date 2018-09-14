@@ -3,7 +3,7 @@ import Selectors from './Selectors';
 import MutationsPlot from './mutationsOverTime';
 import DayPlot from './daysForMutations';
 import ProbabilityOfTransmission from './probabilityOfTransmission';
-import pdfFunctions from './pdf';
+import { pdfFunctions, trapeziumIntegration } from './pdf';
 import '../style/App.css';
 import '../style/plots.css';
 
@@ -18,7 +18,7 @@ class App extends Component {
 			selectedOption: 'Number of Mutations',
 			numberOfMutations: 1,
 			numberOfDays: 1,
-			distributionOptions: ['Normal', 'Gamma'],
+			distributionOptions: ['Gamma', 'Normal'],
 			distributionSelection: 'Gamma',
 			distributionParameters: [0.1, 2],
 		};

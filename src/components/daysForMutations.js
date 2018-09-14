@@ -124,7 +124,7 @@ class DayPlot extends React.Component {
 	render() {
 		return (
 			<div>
-				<div>{`The distribution of days given ${this.props.numberOfMutations} mutations`}</div>
+				<div>{`The distribution of days given ${this.props.numberOfMutations} mutation(s)`}</div>
 				<svg ref={node => (this.node = node)} width={this.props.size[0]} height={this.props.size[1]} />
 			</div>
 		);

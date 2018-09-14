@@ -1,6 +1,7 @@
 import React from 'react';
 import * as d3 from 'd3';
 import * as R from 'ramda';
+import { trapeziumIntegration } from './pdf';
 
 class ProbabilityOfTransmission extends React.Component {
 	constructor(props) {
@@ -46,6 +47,8 @@ class ProbabilityOfTransmission extends React.Component {
 			.scaleLinear()
 			.range([this.props.margin.left, width - this.props.margin.left - this.props.margin.right])
 			.domain([0, d3.max(data.filter(d => d.p > 0.001), d => d.q)]);
+		const tester = trapeziumIntegration(curriedPdf(...this.props.params), [2, 10]);
+		console.log(tester);
 
 		const yScale = d3
 			.scaleLinear()

@@ -130,7 +130,7 @@ class MutationsPlot extends React.Component {
 	render() {
 		return (
 			<div>
-				<div>The number of expected mutations</div>
+				<div>{`The number of expected mutations in ${this.props.numberOfDays} day(s)`}</div>
 				<svg ref={node => (this.node = node)} width={this.props.size[0]} height={this.props.size[1]} />
 			</div>
 		);

@@ -38,7 +38,7 @@
 	padding-top: 5%;
 }
 .box :first-child {
-	width: 150px;
+	width: 500px;
 }
 .container > div {
 	flex-grow: 1; /*grow*/

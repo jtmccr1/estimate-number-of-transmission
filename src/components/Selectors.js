@@ -43,21 +43,23 @@ const Selectors = props => {
 				min: 0.1,
 				max: 50,
 				step: 0.1,
-				name: 'mean',
-				label: `mean: ${props.numberOfDays}`,
-				value: 1, //props.distributionParameters[0].value,
+				name: 'mu',
+				label: `mu: ${props.distributionParameters[0]}`,
+				value: props.distributionParameters[0],
 				updater: props.updater,
-				stateKey: 1, // props.distributionParameters[0].name,
+				stateKey: 'distributionParameters',
+				index: 0,
 			},
 			{
 				min: 0.1,
 				max: 10,
 				step: 0.1,
 				name: 'sigma',
-				label: `sigma: ${props.numberOfDays}`,
-				value: props.numberOfDays,
+				label: `sigma: ${props.distributionParameters[1]}`,
+				value: props.distributionParameters[1],
 				updater: props.updater,
-				stateKey: 'sigma',
+				stateKey: 'distributionParameters',
+				index: 1,
 			},
 		],
 		Gamma: [
@@ -116,12 +118,13 @@ const Selectors = props => {
 				index={0}
 			/>
 			<label>Condition on</label>
-			<select value={props.selectedOption} onChange={e => props.updater('selectedOption', e)}>
+			<select value={props.selectedOption} onChange={e => props.updater('selectedOption', 0, e)}>
 				{options}
 			</select>
 			<Sliderselector {...mutationDayOptions} />
 			<label>Transmission Distribution</label>
-			<select value={props.distributionSelection} onChange={e => props.updater('distributionSelection', e)}>
+
+			<select value={props.distributionSelection} onChange={e => props.updater('distributionSelection', 0, e)}>
 				{distributionOptions}
 			</select>
 			<div>{distributionSliders}</div>
