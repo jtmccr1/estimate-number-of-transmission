@@ -11,7 +11,6 @@ class App extends Component {
 	constructor(props) {
 		super(props);
 		this.updateOnSelection = this.updateOnSelection.bind(this);
-
 		this.state = {
 			evolutionaryRate: 0.001,
 			genomeLength: 13000,
@@ -20,22 +19,23 @@ class App extends Component {
 			numberOfMutations: 1,
 			numberOfDays: 1,
 			distributionOptions: ['Normal', 'Gamma'],
-			distributionSelection: 'Normal',
-			distributionParameters: [],
+			distributionSelection: 'Gamma',
+			distributionParameters: [0.1, 2],
 		};
 	}
-	updateOnSelection(key, event) {
+	updateOnSelection(key, index, event) {
 		let newState = {};
-		newState[key] = event.target.value;
+		if (Array.isArray(this.state[key])) {
+			newState[key] = this.state[key].slice();
+			newState[key][index] = event.target.value;
+		} else {
+			newState[key] = event.target.value;
+		}
+
 		this.setState(newState);
 	}
-	normalPdf(mean, sigma, x) {
-		const exponent = Math.pow(x - mean, 2) / (2 * Math.pow(sigma, 2));
-		const sqrt = 2 * Math.PI * Math.pow(sigma, 2);
-		return Math.pow(Math.sqrt(sqrt), -1) * Math.exp(-exponent);
-	}
+
 	render() {
-		console.log(this.normalPdf(1, 1, 1));
 		return (
 			<div className="container">
 				<div>
@@ -49,6 +49,7 @@ class App extends Component {
 						numberOfMutations={this.state.numberOfMutations}
 						distributionOptions={this.state.distributionOptions}
 						distributionSelection={this.state.distributionSelection}
+						distributionParameters={this.state.distributionParameters}
 					/>
 				</div>
 
@@ -77,8 +78,8 @@ class App extends Component {
 					<ProbabilityOfTransmission
 						size={[700, 500]}
 						margin={{ top: 50, right: 50, bottom: 50, left: 50 }}
-						params={[1, 1]}
-						pdf={this.normalPdf}
+						params={this.state.distributionParameters}
+						pdf={pdfFunctions[this.state.distributionSelection]}
 					/>
 				</div>
 			</div>

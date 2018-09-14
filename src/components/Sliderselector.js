@@ -11,7 +11,7 @@ const Sliderselector = props => {
 				step={props.step}
 				name={props.name}
 				value={props.value}
-				onChange={e => props.updater(props.stateKey, e)}
+				onChange={e => props.updater(props.stateKey, props.index, e)}
 				className="sliderSelector"
 			/>
 		</div>

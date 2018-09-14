@@ -18,7 +18,7 @@ class ProbabilityOfTransmission extends React.Component {
 	drawPlot() {
 		//Helper functions
 		function getData2(data, pdf) {
-			let i = 0;
+			let i = 0.001;
 			let needSomeDensity = true;
 			do {
 				const el = {
@@ -26,7 +26,7 @@ class ProbabilityOfTransmission extends React.Component {
 					p: pdf(i),
 				};
 				data.push(el);
-				i = i + 0.1;
+				i = i + 0.01;
 				needSomeDensity = d3.max(data, d => d.p) < 0.001 ? true : false; // So we don't stop too soon
 			} while (data[data.length - 1].p > 0.001 || needSomeDensity);
 		}

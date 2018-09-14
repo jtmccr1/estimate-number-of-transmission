@@ -16,6 +16,7 @@ const Selectors = props => {
 		value: props.numberOfMutations,
 		updater: props.updater,
 		stateKey: 'numberOfMutations',
+		index: 0,
 	};
 
 	const dayOptions = {
@@ -27,6 +28,7 @@ const Selectors = props => {
 		value: props.numberOfDays,
 		updater: props.updater,
 		stateKey: 'numberOfDays',
+		index: 0,
 	};
 
 	const distributionOptions = props.distributionOptions.map((x, i) => (
@@ -61,29 +63,31 @@ const Selectors = props => {
 		Gamma: [
 			{
 				min: 0.1,
-				max: 50,
+				max: 10,
 				step: 0.1,
 				name: 'shape1',
-				label: `shape1: ${props.numberOfDays}`,
-				value: 1, //props.distributionParameters[0].value,
+				label: `shape1: ${props.distributionParameters[0]}`,
+				value: props.distributionParameters[0],
 				updater: props.updater,
-				stateKey: 1, //props.distributionParameters[0].name,
+				stateKey: 'distributionParameters',
+				index: 0,
 			},
 			{
 				min: 0.1,
-				max: 50,
+				max: 10,
 				step: 0.1,
 				name: 'shape2',
-				label: `shape2: ${props.numberOfDays}`,
-				value: props.numberOfDays,
+				label: `shape2: ${props.distributionParameters[1]}`,
+				value: props.distributionParameters[1],
 				updater: props.updater,
-				stateKey: 'shape2',
+				stateKey: 'distributionParameters',
+				index: 1,
 			},
 		],
 	};
 
 	const distributionSliders = distributionSlidersOptions[props.distributionSelection].map((x, i) => (
-		<Sliderselector {...x} />
+		<Sliderselector {...x} key={i} />
 	));
 
 	const mutationDayOptions = props.selectedOption === 'Number of Mutations' ? mutationOptions : dayOptions;
@@ -98,6 +102,7 @@ const Selectors = props => {
 				value={props.evolutionaryRate}
 				updater={props.updater}
 				stateKey={'evolutionaryRate'}
+				index={0}
 			/>
 			<Sliderselector
 				min={10000}
@@ -108,6 +113,7 @@ const Selectors = props => {
 				value={props.genomeLength}
 				updater={props.updater}
 				stateKey={'genomeLength'}
+				index={0}
 			/>
 			<label>Condition on</label>
 			<select value={props.selectedOption} onChange={e => props.updater('selectedOption', e)}>

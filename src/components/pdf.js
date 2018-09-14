@@ -1,3 +1,4 @@
+import { gamma } from 'mathjs';
 function normalPdf(mean, sigma, x) {
 	const exponent = Math.pow(x - mean, 2) / (2 * Math.pow(sigma, 2));
 	const sqrt = 2 * Math.PI * Math.pow(sigma, 2);
@@ -12,7 +13,7 @@ function gammaPdf(shape1, shape2, x) {
 		return (f[n] = factorial(n - 1) * n);
 	};
 	const numerator = Math.pow(shape2, shape1) * Math.pow(x, shape1 - 1) * Math.exp(-shape2 * x);
-	const demominator = factorial(shape1 - 1);
+	const demominator = gamma(shape1);
 	return numerator / demominator;
 }
 
