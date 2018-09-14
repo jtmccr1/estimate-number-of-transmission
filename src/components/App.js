@@ -1,7 +1,9 @@
 import React, { Component } from 'react';
-import logo from '../logo.svg';
 import Selectors from './Selectors';
+import MutationsPlot from './mutationsOverTime';
+import DayPlot from './daysForMutations';
 import '../style/App.css';
+import '../style/plots.css';
 
 class App extends Component {
 	constructor(props) {
@@ -15,6 +17,8 @@ class App extends Component {
 			selectedOption: 'Number of Mutations',
 			numberOfMutations: 1,
 			numberOfDays: 1,
+			distributionOptions: ['Normal', 'Gamma'],
+			distributionSelection: 'Normal',
 		};
 	}
 	updateOnSelection(key, event) {
@@ -34,22 +38,32 @@ class App extends Component {
 						selectedOption={this.state.selectedOption}
 						numberOfDays={this.state.numberOfDays}
 						numberOfMutations={this.state.numberOfMutations}
+						distributionOptions={this.state.distributionOptions}
+						distributionSelection={this.state.distributionSelection}
 					/>
 				</div>
 
-				<div>
-					<mutationsPlot
-						size={[500, 500]}
-						margins={{ top: 50, right: 50, bottom: 10, left: 50 }}
-						genomeLength={this.state.genomeLength}
-						evolutionaryRate={this.state.evolutionaryRate}
-						numberOfDays={this.state.numberOfDays}
-					/>
-				</div>
-
-				<div>
-					<p>{'Plot2'}</p>
-				</div>
+				{this.state.selectedOption === 'Number of Mutations' ? (
+					<div>
+						<DayPlot
+							size={[700, 500]}
+							margin={{ top: 50, right: 50, bottom: 50, left: 50 }}
+							genomeLength={this.state.genomeLength}
+							evolutionaryRate={this.state.evolutionaryRate}
+							numberOfMutations={this.state.numberOfMutations}
+						/>
+					</div>
+				) : (
+					<div>
+						<MutationsPlot
+							size={[700, 500]}
+							margin={{ top: 50, right: 50, bottom: 50, left: 50 }}
+							genomeLength={this.state.genomeLength}
+							evolutionaryRate={this.state.evolutionaryRate}
+							numberOfDays={this.state.numberOfDays}
+						/>
+					</div>
+				)}
 			</div>
 		);
 	}

@@ -1,4 +1,4 @@
-import React, { Component } from 'react';
+import React from 'react';
 import '../style/selectors.css';
 const Sliderselector = props => {
 	return (

@@ -1,7 +1,8 @@
 import React from 'react';
 import * as d3 from 'd3';
+import * as R from 'ramda';
 
-class MutationsPlot extends React.Component {
+class ProbabilityOfTransmission extends React.Component {
 	constructor(props) {
 		super(props);
 		this.drawPlot = this.drawPlot.bind(this);
@@ -22,31 +23,26 @@ class MutationsPlot extends React.Component {
 			if (f[n] > 0) return f[n];
 			return (f[n] = factorial(n - 1) * n);
 		};
-		// from http://bl.ocks.org/mbostock/4349187 from https://github.com/rambaut/Probability-of-Difference/blob/gh-pages/index.html
-		// Sample from a normal distribution with mean 0, stddev 1.
-		const probabilityOfNumberOfChanges = function(mutations, days, genomeLength, ratePerSitePerYear) {
-			const averageChangesPerYear = ratePerSitePerYear * genomeLength;
-			const averageChangesPerDay = averageChangesPerYear / 365;
-			const averageChangesInDays = averageChangesPerDay * days;
-			const prob =
-				(Math.exp(-averageChangesInDays) * Math.pow(averageChangesInDays, mutations)) / factorial(mutations);
-			return prob;
-		};
-
-		const getData = function(data, genomeLength, ratePerSitePerYear, numberOfDays) {
+		function getData2(data, erlangPdf) {
 			let i = 0;
 			let needSomeDensity = true;
 			do {
 				const el = {
 					q: i,
-					p: probabilityOfNumberOfChanges(i, genomeLength, ratePerSitePerYear, numberOfDays),
+					p: erlangPdf(i),
 				};
 				data.push(el);
 				i++;
 				needSomeDensity = d3.max(data, d => d.p) < 0.001 ? true : false; // So we don't stop too soon
 			} while (data[i - 1].p > 0.001 || needSomeDensity);
-		};
-
+		}
+		const erlangBasePdf = R.curry((k, lamda, day) => {
+			const numerator = Math.pow(lamda, k) * Math.pow(day, k - 1) * Math.exp(-lamda * day);
+			const demominator = factorial(k - 1);
+			return numerator / demominator;
+		});
+		const averageChangesPerYear = this.props.evolutionaryRate * this.props.genomeLength;
+		const averageChangesPerDay = averageChangesPerYear / 365;
 		// draw the plot
 		const width = this.props.size[0];
 		const height = this.props.size[1];
@@ -55,23 +51,19 @@ class MutationsPlot extends React.Component {
 		const svg = d3.select(node).style('font', '10px sans-serif');
 
 		const data = [];
-
-		getData(data, this.props.genomeLength, this.props.evolutionaryRate, this.props.numberOfDays); // popuate data
-
+		const erlangPdf = erlangBasePdf(this.props.numberOfMutations, averageChangesPerDay);
+		getData2(data, erlangPdf);
+		// popuate data
+		// line chart based on http://bl.ocks.org/mbostock/3883245
 		const xScale = d3
-			.scaleBand()
+			.scaleLinear()
 			.range([this.props.margin.left, width - this.props.margin.left - this.props.margin.right])
-			.padding(0.1)
-			.domain(
-				data.map(function(d) {
-					return d.q;
-				})
-			);
+			.domain([0, d3.max(data.filter(d => d.p > 0.001), d => d.q)]);
 
 		const yScale = d3
 			.scaleLinear()
 			.range([height - this.props.margin.top - this.props.margin.bottom, this.props.margin.bottom])
-			.domain([0, 1]);
+			.domain([0, d3.max(data, d => d.p)]);
 		const xAxis = d3
 			.axisBottom()
 			.scale(xScale)
@@ -81,12 +73,18 @@ class MutationsPlot extends React.Component {
 			.scale(yScale)
 			.ticks(5);
 
+		const makeLinePath = d3
+			.line()
+			.x(d => xScale(d.q))
+			.y(d => yScale(d.p));
+
 		//remove current plot
 		svg.selectAll('g').remove();
 		// do the drawing
 		svg.append('g').attr('transform', `translate(${this.props.margin.left},${this.props.margin.top})`);
 
 		const svgGroup = svg.select('g');
+
 		svgGroup
 			.append('g')
 			.attr('class', 'x axis')
@@ -100,7 +98,8 @@ class MutationsPlot extends React.Component {
 				`translate(${width / 2},${height - this.props.margin.top - this.props.margin.bottom + 30})`
 			)
 			.style('text-anchor', 'middle')
-			.text('Number of Mutations');
+			.text('Number of days between sampling');
+
 		svgGroup
 			.append('g')
 			.attr('class', 'y axis')
@@ -110,31 +109,26 @@ class MutationsPlot extends React.Component {
 		svgGroup
 			.append('text')
 			.attr('transform', 'rotate(-90)')
-			.attr('y', this.props.margin.left - 45)
+			.attr('y', this.props.margin.left - 60)
 			.attr('x', 0 - height / 2)
 			.attr('dy', '1em')
 			.style('text-anchor', 'middle')
-			.text('Probability');
+			.text('Probability density');
 
 		svgGroup
-			.selectAll('rect')
-			.data(data)
-			.enter()
-			.append('rect')
-			.attr('class', 'prob-rect')
-			.attr('x', d => xScale(d.q))
-			.attr('width', xScale.bandwidth())
-			.attr('y', d => yScale(d.p))
-			.attr('height', d => height - this.props.margin.bottom - this.props.margin.top - yScale(d.p));
+			.append('path')
+			.datum(data)
+			.attr('class', 'line')
+			.attr('d', makeLinePath);
 	}
 	render() {
 		return (
 			<div>
-				<div>The number of expected mutations</div>
+				<div>{`The probability of Transmission over time`}</div>
 				<svg ref={node => (this.node = node)} width={this.props.size[0]} height={this.props.size[1]} />
 			</div>
 		);
 	}
 }
 
-export default MutationsPlot;
+export default ProbabilityOfTransmission;
