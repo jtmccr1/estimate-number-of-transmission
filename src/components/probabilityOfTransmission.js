@@ -17,32 +17,20 @@ class ProbabilityOfTransmission extends React.Component {
 
 	drawPlot() {
 		//Helper functions
-		let f = [];
-		const factorial = function(n) {
-			if (n === 0 || n === 1) return 1;
-			if (f[n] > 0) return f[n];
-			return (f[n] = factorial(n - 1) * n);
-		};
-		function getData2(data, erlangPdf) {
+		function getData2(data, pdf) {
 			let i = 0;
 			let needSomeDensity = true;
 			do {
 				const el = {
 					q: i,
-					p: erlangPdf(i),
+					p: pdf(i),
 				};
 				data.push(el);
-				i++;
+				i = i + 0.1;
 				needSomeDensity = d3.max(data, d => d.p) < 0.001 ? true : false; // So we don't stop too soon
-			} while (data[i - 1].p > 0.001 || needSomeDensity);
+			} while (data[data.length - 1].p > 0.001 || needSomeDensity);
 		}
-		const erlangBasePdf = R.curry((k, lamda, day) => {
-			const numerator = Math.pow(lamda, k) * Math.pow(day, k - 1) * Math.exp(-lamda * day);
-			const demominator = factorial(k - 1);
-			return numerator / demominator;
-		});
-		const averageChangesPerYear = this.props.evolutionaryRate * this.props.genomeLength;
-		const averageChangesPerDay = averageChangesPerYear / 365;
+		const curriedPdf = R.curry(this.props.pdf);
 		// draw the plot
 		const width = this.props.size[0];
 		const height = this.props.size[1];
@@ -51,8 +39,7 @@ class ProbabilityOfTransmission extends React.Component {
 		const svg = d3.select(node).style('font', '10px sans-serif');
 
 		const data = [];
-		const erlangPdf = erlangBasePdf(this.props.numberOfMutations, averageChangesPerDay);
-		getData2(data, erlangPdf);
+		getData2(data, curriedPdf(...this.props.params));
 		// popuate data
 		// line chart based on http://bl.ocks.org/mbostock/3883245
 		const xScale = d3

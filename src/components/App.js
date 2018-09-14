@@ -2,6 +2,8 @@ import React, { Component } from 'react';
 import Selectors from './Selectors';
 import MutationsPlot from './mutationsOverTime';
 import DayPlot from './daysForMutations';
+import ProbabilityOfTransmission from './probabilityOfTransmission';
+import pdfFunctions from './pdf';
 import '../style/App.css';
 import '../style/plots.css';
 
@@ -19,6 +21,7 @@ class App extends Component {
 			numberOfDays: 1,
 			distributionOptions: ['Normal', 'Gamma'],
 			distributionSelection: 'Normal',
+			distributionParameters: [],
 		};
 	}
 	updateOnSelection(key, event) {
@@ -26,7 +29,13 @@ class App extends Component {
 		newState[key] = event.target.value;
 		this.setState(newState);
 	}
+	normalPdf(mean, sigma, x) {
+		const exponent = Math.pow(x - mean, 2) / (2 * Math.pow(sigma, 2));
+		const sqrt = 2 * Math.PI * Math.pow(sigma, 2);
+		return Math.pow(Math.sqrt(sqrt), -1) * Math.exp(-exponent);
+	}
 	render() {
+		console.log(this.normalPdf(1, 1, 1));
 		return (
 			<div className="container">
 				<div>
@@ -64,6 +73,14 @@ class App extends Component {
 						/>
 					</div>
 				)}
+				<div>
+					<ProbabilityOfTransmission
+						size={[700, 500]}
+						margin={{ top: 50, right: 50, bottom: 50, left: 50 }}
+						params={[1, 1]}
+						pdf={this.normalPdf}
+					/>
+				</div>
 			</div>
 		);
 	}
