@@ -3,7 +3,8 @@ import Selectors from './Selectors';
 import MutationsPlot from './mutationsOverTime';
 import DayPlot from './daysForMutations';
 import ProbabilityOfTransmission from './probabilityOfTransmission';
-import { pdfFunctions } from './pdf';
+import NumberOfTransmissions from './numberOfTransmissions';
+import { pdfFunctions, cdfFunctions } from './pdf';
 import '../style/App.css';
 import '../style/plots.css';
 
@@ -80,6 +81,14 @@ class App extends Component {
 						margin={{ top: 50, right: 50, bottom: 50, left: 50 }}
 						params={this.state.distributionParameters}
 						pdf={pdfFunctions[this.state.distributionSelection]}
+					/>
+				</div>
+				<div>
+					<NumberOfTransmissions
+						size={[700, 500]}
+						margin={{ top: 50, right: 50, bottom: 50, left: 50 }}
+						params={this.state.distributionParameters}
+						pdf={cdfFunctions[this.state.distributionSelection]}
 					/>
 				</div>
 			</div>
