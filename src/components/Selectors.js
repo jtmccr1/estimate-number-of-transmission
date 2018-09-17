@@ -9,7 +9,7 @@ const Selectors = props => {
 	));
 	const mutationOptions = {
 		min: 1,
-		max: 50,
+		max: 20,
 		step: 1,
 		name: 'Number of mutations observed',
 		label: `Number of mutations : ${props.numberOfMutations}`,
@@ -38,10 +38,10 @@ const Selectors = props => {
 	));
 
 	const distributionSlidersOptions = {
-		Normal: [
+		LogNormal: [
 			{
 				min: 0.1,
-				max: 50,
+				max: 5,
 				step: 0.1,
 				name: 'mu',
 				label: `mu: ${props.distributionParameters[0]}`,
@@ -52,7 +52,7 @@ const Selectors = props => {
 			},
 			{
 				min: 0.1,
-				max: 10,
+				max: 3,
 				step: 0.1,
 				name: 'sigma',
 				label: `sigma: ${props.distributionParameters[1]}`,
@@ -78,8 +78,8 @@ const Selectors = props => {
 				min: 0.1,
 				max: 10,
 				step: 0.1,
-				name: 'shape2',
-				label: `shape2: ${props.distributionParameters[1]}`,
+				name: 'scale',
+				label: `scale: ${props.distributionParameters[1]}`,
 				value: props.distributionParameters[1],
 				updater: props.updater,
 				stateKey: 'distributionParameters',
@@ -96,7 +96,7 @@ const Selectors = props => {
 	return (
 		<div>
 			<Sliderselector
-				min={0.00001}
+				min={0.0005}
 				max={0.005}
 				step={0.00001}
 				name={'Evoluonary Rate'}
@@ -118,13 +118,16 @@ const Selectors = props => {
 				index={0}
 			/>
 			<label>Condition on</label>
-			<select value={props.selectedOption} onChange={e => props.updater('selectedOption', 0, e)}>
+			<select value={props.selectedOption} onChange={e => props.updater('selectedOption', 0, e, false)}>
 				{options}
 			</select>
 			<Sliderselector {...mutationDayOptions} />
 			<label>Transmission Distribution</label>
 
-			<select value={props.distributionSelection} onChange={e => props.updater('distributionSelection', 0, e)}>
+			<select
+				value={props.distributionSelection}
+				onChange={e => props.updater('distributionSelection', 0, e, false)}
+			>
 				{distributionOptions}
 			</select>
 			<div>{distributionSliders}</div>

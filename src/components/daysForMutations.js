@@ -1,6 +1,7 @@
 import React from 'react';
 import * as d3 from 'd3';
 import * as R from 'ramda';
+import * as jStat from 'jStat';
 
 class DayPlot extends React.Component {
 	constructor(props) {
@@ -23,24 +24,21 @@ class DayPlot extends React.Component {
 			if (f[n] > 0) return f[n];
 			return (f[n] = factorial(n - 1) * n);
 		};
-		function getData2(data, erlangPdf) {
+		function getData2(data, pdf) {
 			let i = 0;
 			let needSomeDensity = true;
 			do {
 				const el = {
 					q: i,
-					p: erlangPdf(i),
+					p: pdf(i),
 				};
 				data.push(el);
+				// This freezes when the numbers get big. We can take bigger steps in these cases.
 				i++;
 				needSomeDensity = d3.max(data, d => d.p) < 0.001 ? true : false; // So we don't stop too soon
 			} while (data[i - 1].p > 0.001 || needSomeDensity);
 		}
-		const erlangBasePdf = R.curry((k, lamda, day) => {
-			const numerator = Math.pow(lamda, k) * Math.pow(day, k - 1) * Math.exp(-lamda * day);
-			const demominator = factorial(k - 1);
-			return numerator / demominator;
-		});
+		const curriedGamma = R.curry(jStat.gamma.pdf);
 		const averageChangesPerYear = this.props.evolutionaryRate * this.props.genomeLength;
 		const averageChangesPerDay = averageChangesPerYear / 365;
 		// draw the plot
@@ -51,8 +49,8 @@ class DayPlot extends React.Component {
 		const svg = d3.select(node).style('font', '10px sans-serif');
 
 		const data = [];
-		const erlangPdf = erlangBasePdf(this.props.numberOfMutations, averageChangesPerDay);
-		getData2(data, erlangPdf);
+		const waitingGamma = curriedGamma(R.__, this.props.numberOfMutations, 1 / averageChangesPerDay);
+		getData2(data, waitingGamma);
 		// popuate data
 		// line chart based on http://bl.ocks.org/mbostock/3883245
 		const xScale = d3

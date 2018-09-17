@@ -3,7 +3,7 @@ import Selectors from './Selectors';
 import MutationsPlot from './mutationsOverTime';
 import DayPlot from './daysForMutations';
 import ProbabilityOfTransmission from './probabilityOfTransmission';
-import { pdfFunctions, trapeziumIntegration } from './pdf';
+import { pdfFunctions } from './pdf';
 import '../style/App.css';
 import '../style/plots.css';
 
@@ -18,23 +18,23 @@ class App extends Component {
 			selectedOption: 'Number of Mutations',
 			numberOfMutations: 1,
 			numberOfDays: 1,
-			distributionOptions: ['Gamma', 'Normal'],
+			distributionOptions: ['Gamma', 'LogNormal'],
 			distributionSelection: 'Gamma',
 			distributionParameters: [0.1, 2],
 		};
 	}
-	updateOnSelection(key, index, event) {
+	updateOnSelection(key, index, event, numeric = true) {
 		let newState = {};
+		const newValue = numeric ? parseFloat(event.target.value) : event.target.value;
 		if (Array.isArray(this.state[key])) {
 			newState[key] = this.state[key].slice();
-			newState[key][index] = event.target.value;
+			newState[key][index] = newValue;
 		} else {
-			newState[key] = event.target.value;
+			newState[key] = newValue;
 		}
 
 		this.setState(newState);
 	}
-
 	render() {
 		return (
 			<div className="container">
