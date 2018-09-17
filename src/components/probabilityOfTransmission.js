@@ -65,6 +65,12 @@ class ProbabilityOfTransmission extends React.Component {
 			.x(d => xScale(d.q))
 			.y(d => yScale(d.p));
 
+		const area = d3
+			.area()
+			.x(d => xScale(d.q))
+			.y0(height - this.props.margin.bottom - this.props.margin.top)
+			.y1(d => yScale(d.p));
+
 		//remove current plot
 		svg.selectAll('g').remove();
 		// do the drawing
@@ -85,7 +91,7 @@ class ProbabilityOfTransmission extends React.Component {
 				`translate(${width / 2},${height - this.props.margin.top - this.props.margin.bottom + 30})`
 			)
 			.style('text-anchor', 'middle')
-			.text('Number of days between sampling');
+			.text('Days post infection');
 
 		svgGroup
 			.append('g')
@@ -102,6 +108,11 @@ class ProbabilityOfTransmission extends React.Component {
 			.style('text-anchor', 'middle')
 			.text('Probability density');
 
+		svgGroup
+			.append('path')
+			.datum(data.filter(d => d.q <= this.props.numberOfDays))
+			.attr('class', 'area')
+			.attr('d', area);
 		svgGroup
 			.append('path')
 			.datum(data)

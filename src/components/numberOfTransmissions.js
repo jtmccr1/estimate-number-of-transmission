@@ -1,6 +1,7 @@
 import React from 'react';
 import * as d3 from 'd3';
 import * as R from 'ramda';
+import { numericalIntegration } from './pdf';
 
 class NumberOfTransmissions extends React.Component {
 	constructor(props) {
@@ -17,20 +18,23 @@ class NumberOfTransmissions extends React.Component {
 
 	drawPlot() {
 		//Helper functions
-		function getData2(data, pdf) {
-			let i = 1;
-			let needSomeDensity = true;
-			do {
-				const el = {
-					q: i,
-					p: pdf(i),
-				};
-				data.push(el);
-				i++;
-				needSomeDensity = d3.max(data, d => d.p) < 0.001 ? true : false; // So we don't stop too soon
-			} while (i < 5);
+		function getData2(data, cdf, numberOfDays) {
+			const cdf2 = (maxX, x) => cdf(maxX - x) * cdf(x); // * (1 - cdf(x));
+			const cdf2Curried = R.curry(cdf2);
+			data.push({
+				q: 0,
+				p: 1 - cdf(numberOfDays),
+			});
+			data.push({
+				q: 1,
+				p: cdf(numberOfDays), //* (1 - numericalIntegration(cdf2Curried(numberOfDays), [0, numberOfDays], 10000)),
+			});
+			data.push({
+				q: 2,
+				p: numericalIntegration(cdf2Curried(numberOfDays), [0, numberOfDays], 100000),
+			});
 		}
-		const curriedPdf = R.curry(this.props.pdf);
+		const curriedCdf = R.curry(this.props.cdf);
 		// draw the plot
 		const width = this.props.size[0];
 		const height = this.props.size[1];
@@ -39,18 +43,25 @@ class NumberOfTransmissions extends React.Component {
 		const svg = d3.select(node).style('font', '10px sans-serif');
 
 		const data = [];
-		getData2(data, curriedPdf(R.__, ...this.props.params));
+		getData2(data, curriedCdf(R.__, ...this.props.params), this.props.numberOfDays);
+		console.log(d3.sum(data, d => d.p));
+		console.log(data);
 		// popuate data
 		// line chart based on http://bl.ocks.org/mbostock/3883245
 		const xScale = d3
-			.scaleLinear()
+			.scaleBand()
 			.range([this.props.margin.left, width - this.props.margin.left - this.props.margin.right])
-			.domain([0, d3.max(data.filter(d => d.p > 0.001), d => d.q)]);
+			.padding(0.1)
+			.domain(
+				data.map(function(d) {
+					return d.q;
+				})
+			);
 
 		const yScale = d3
 			.scaleLinear()
 			.range([height - this.props.margin.top - this.props.margin.bottom, this.props.margin.bottom])
-			.domain([0, d3.max(data, d => d.p)]);
+			.domain([0, 1]); // d3.max(data, d => d.p)]);
 		const xAxis = d3
 			.axisBottom()
 			.scale(xScale)
@@ -59,11 +70,6 @@ class NumberOfTransmissions extends React.Component {
 			.axisLeft()
 			.scale(yScale)
 			.ticks(5);
-
-		const makeLinePath = d3
-			.line()
-			.x(d => xScale(d.q))
-			.y(d => yScale(d.p));
 
 		//remove current plot
 		svg.selectAll('g').remove();
@@ -85,7 +91,7 @@ class NumberOfTransmissions extends React.Component {
 				`translate(${width / 2},${height - this.props.margin.top - this.props.margin.bottom + 30})`
 			)
 			.style('text-anchor', 'middle')
-			.text('Number of days between sampling');
+			.text('Number transmission events');
 
 		svgGroup
 			.append('g')
@@ -100,13 +106,18 @@ class NumberOfTransmissions extends React.Component {
 			.attr('x', 0 - height / 2)
 			.attr('dy', '1em')
 			.style('text-anchor', 'middle')
-			.text('Probability density');
+			.text('Probability');
 
 		svgGroup
-			.append('path')
-			.datum(data)
-			.attr('class', 'line')
-			.attr('d', makeLinePath);
+			.selectAll('rect')
+			.data(data)
+			.enter()
+			.append('rect')
+			.attr('class', 'prob-rect')
+			.attr('x', d => xScale(d.q))
+			.attr('width', xScale.bandwidth())
+			.attr('y', d => yScale(d.p))
+			.attr('height', d => height - this.props.margin.bottom - this.props.margin.top - yScale(d.p));
 	}
 	render() {
 		return (
