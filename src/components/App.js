@@ -4,6 +4,7 @@ import MutationsPlot from './mutationsOverTime';
 import DayPlot from './daysForMutations';
 import ProbabilityOfTransmission from './probabilityOfTransmission';
 import NumberOfTransmissions from './numberOfTransmissions';
+import NumberOfTransmissionsGivenMutations from './numberOfTransmissionsGivenMutations';
 import { pdfFunctions, cdfFunctions } from './pdf';
 import '../style/App.css';
 import '../style/plots.css';
@@ -21,7 +22,7 @@ class App extends Component {
 			numberOfDays: 1,
 			distributionOptions: ['Gamma'], //'LogNormal'],
 			distributionSelection: 'Gamma',
-			distributionParameters: [1, 2],
+			distributionParameters: [1.5, 3],
 		};
 	}
 	updateOnSelection(key, index, event, numeric = true) {
@@ -83,6 +84,7 @@ class App extends Component {
 							params={this.state.distributionParameters}
 							pdf={pdfFunctions[this.state.distributionSelection]}
 							numberOfDays={this.state.numberOfDays}
+							fixOn={this.state.selectedOption}
 						/>
 					</div>
 				</div>
@@ -99,7 +101,17 @@ class App extends Component {
 							/>
 						</div>
 					) : (
-						<div />
+						<div>
+							<NumberOfTransmissionsGivenMutations
+								size={[700, 500]}
+								margin={{ top: 50, right: 50, bottom: 50, left: 50 }}
+								params={this.state.distributionParameters}
+								genomeLength={this.state.genomeLength}
+								evolutionaryRate={this.state.evolutionaryRate}
+								cdf={cdfFunctions[this.state.distributionSelection]}
+								numberOfMutations={this.state.numberOfMutations}
+							/>
+						</div>
 					)}
 					<div />
 				</div>

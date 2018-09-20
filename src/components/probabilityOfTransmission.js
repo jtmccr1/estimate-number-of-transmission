@@ -107,12 +107,13 @@ class ProbabilityOfTransmission extends React.Component {
 			.attr('dy', '1em')
 			.style('text-anchor', 'middle')
 			.text('Probability density');
-
-		svgGroup
-			.append('path')
-			.datum(data.filter(d => d.q <= this.props.numberOfDays))
-			.attr('class', 'area')
-			.attr('d', area);
+		if (this.props.fixOn === 'Number of Days') {
+			svgGroup
+				.append('path')
+				.datum(data.filter(d => d.q <= this.props.numberOfDays))
+				.attr('class', 'area')
+				.attr('d', area);
+		}
 		svgGroup
 			.append('path')
 			.datum(data)
