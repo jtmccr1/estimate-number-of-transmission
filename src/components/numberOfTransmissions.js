@@ -18,23 +18,33 @@ class NumberOfTransmissions extends React.Component {
 
 	drawPlot() {
 		//Helper functions
-		function getData2(data, cdf, numberOfDays) {
-			const cdf2 = (maxX, x) => cdf(maxX - x) * cdf(x); // * (1 - cdf(x));
-			const cdf2Curried = R.curry(cdf2);
+		// The sum of 2 gamma distributions with the same rate parameter is a gamma distribution with shape a1+a2
+		function getData2(data, cdf, params, numberOfDays) {
 			data.push({
 				q: 0,
-				p: 1 - cdf(numberOfDays),
+				p: 1 - cdf(numberOfDays, params[0], params[1]),
+				pOnly: 1 - cdf(numberOfDays, params[0], params[1]),
 			});
-			data.push({
-				q: 1,
-				p: cdf(numberOfDays), //* (1 - numericalIntegration(cdf2Curried(numberOfDays), [0, numberOfDays], 10000)),
-			});
-			data.push({
-				q: 2,
-				p: numericalIntegration(cdf2Curried(numberOfDays), [0, numberOfDays], 100000),
-			});
+			let i = 1;
+			let needSomeDensity = true;
+			do {
+				const el = {
+					q: i,
+					p: cdf(numberOfDays, i * params[0], params[1]),
+				};
+				data.push(el);
+				i++;
+				needSomeDensity = d3.max(data, d => d.p) < 0.001 ? true : false; // So we don't stop too soon
+			} while (data[i - 1].p > 0.001 || needSomeDensity);
+
+			// Now fix so its the probably of exactly 1 or 2 ect.
+			let moreTransmission = 0;
+			for (let i = data.length - 1; i >= 1; --i) {
+				// The last one is fine (to approximation) as is the first one
+				data[i].pOnly = data[i].p - moreTransmission;
+				moreTransmission = moreTransmission + data[i].pOnly;
+			}
 		}
-		const curriedCdf = R.curry(this.props.cdf);
 		// draw the plot
 		const width = this.props.size[0];
 		const height = this.props.size[1];
@@ -43,7 +53,7 @@ class NumberOfTransmissions extends React.Component {
 		const svg = d3.select(node).style('font', '10px sans-serif');
 
 		const data = [];
-		getData2(data, curriedCdf(R.__, ...this.props.params), this.props.numberOfDays);
+		getData2(data, this.props.cdf, this.props.params, this.props.numberOfDays);
 		console.log(d3.sum(data, d => d.p));
 		console.log(data);
 		// popuate data
@@ -116,13 +126,13 @@ class NumberOfTransmissions extends React.Component {
 			.attr('class', 'prob-rect')
 			.attr('x', d => xScale(d.q))
 			.attr('width', xScale.bandwidth())
-			.attr('y', d => yScale(d.p))
-			.attr('height', d => height - this.props.margin.bottom - this.props.margin.top - yScale(d.p));
+			.attr('y', d => yScale(d.pOnly))
+			.attr('height', d => height - this.props.margin.bottom - this.props.margin.top - yScale(d.pOnly));
 	}
 	render() {
 		return (
 			<div>
-				<div>{`The probability number of transmission events observed`}</div>
+				<div>{`The probability number of transmission events expected in ${this.props.numberOfDays} Days`}</div>
 				<svg ref={node => (this.node = node)} width={this.props.size[0]} height={this.props.size[1]} />
 			</div>
 		);

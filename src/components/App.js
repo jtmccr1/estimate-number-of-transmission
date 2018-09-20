@@ -19,9 +19,9 @@ class App extends Component {
 			selectedOption: 'Number of Mutations',
 			numberOfMutations: 1,
 			numberOfDays: 1,
-			distributionOptions: ['Gamma', 'LogNormal'],
+			distributionOptions: ['Gamma'], //'LogNormal'],
 			distributionSelection: 'Gamma',
-			distributionParameters: [0.1, 2],
+			distributionParameters: [1, 2],
 		};
 	}
 	updateOnSelection(key, index, event, numeric = true) {
