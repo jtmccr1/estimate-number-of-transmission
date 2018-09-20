@@ -54,8 +54,7 @@ class NumberOfTransmissions extends React.Component {
 
 		const data = [];
 		getData2(data, this.props.cdf, this.props.params, this.props.numberOfDays);
-		console.log(d3.sum(data, d => d.p));
-		console.log(data);
+
 		// popuate data
 		// line chart based on http://bl.ocks.org/mbostock/3883245
 		const xScale = d3
