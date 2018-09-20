@@ -71,10 +71,20 @@ class NumberOfTransmissions extends React.Component {
 			.scaleLinear()
 			.range([height - this.props.margin.top - this.props.margin.bottom, this.props.margin.bottom])
 			.domain([0, 1]); // d3.max(data, d => d.p)]);
+
+		// Max 30 ticks
+		//https://stackoverflow.com/questions/40924437/skipping-overlapping-labels-on-x-axis-for-a-barchart-in-dc-js
+		const stride = Math.ceil(data.length / 30);
+		const ticks = data
+			.filter(function(v, i) {
+				return i % stride === 0;
+			})
+			.map(d => d.q);
+
 		const xAxis = d3
 			.axisBottom()
 			.scale(xScale)
-			.ticks(10);
+			.tickValues(ticks);
 		const yAxis = d3
 			.axisLeft()
 			.scale(yScale)

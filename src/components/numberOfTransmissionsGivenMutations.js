@@ -74,33 +74,40 @@ class NumberOfTransmissionsGivenMutations extends React.Component {
 
 		// popuate data
 		// line chart based on http://bl.ocks.org/mbostock/3883245
+
 		const xScale = d3
-			.scaleLinear()
+			.scaleBand()
 			.range([this.props.margin.left, width - this.props.margin.left - this.props.margin.right])
-			.domain([0, d3.max(data.filter(d => d.pOnly > 0.001), d => d.q)]);
+			.padding(0.1)
+			.domain(
+				data.map(function(d) {
+					return d.q;
+				})
+			);
 
 		const yScale = d3
 			.scaleLinear()
 			.range([height - this.props.margin.top - this.props.margin.bottom, this.props.margin.bottom])
 			.domain([0, d3.max(data, d => d.pOnly)]);
+
+		// Max 30 ticks
+		//https://stackoverflow.com/questions/40924437/skipping-overlapping-labels-on-x-axis-for-a-barchart-in-dc-js
+		const stride = Math.ceil(data.length / 30);
+		const ticks = data
+			.filter(function(v, i) {
+				return i % stride === 0;
+			})
+			.map(d => d.q);
+
 		const xAxis = d3
 			.axisBottom()
 			.scale(xScale)
-			.ticks(10);
+			.tickValues(ticks);
 		const yAxis = d3
 			.axisLeft()
 			.scale(yScale)
 			.ticks(5);
-		const makeLinePath = d3
-			.line()
-			.x(d => xScale(d.q))
-			.y(d => yScale(d.pOnly))
-			.curve(d3.curveStepAfter);
-		/* 		const area = d3
-			.area()
-			.x(d => xScale(d.q))
-			.y0(height - this.props.margin.bottom - this.props.margin.top)
-			.y1(d => yScale(d.pOnly)); */
+
 		//remove current plot
 		svg.selectAll('g').remove();
 		// do the drawing
@@ -138,18 +145,7 @@ class NumberOfTransmissionsGivenMutations extends React.Component {
 			.style('text-anchor', 'middle')
 			.text('Probability');
 
-		// svgGroup
-		// 	.append('path')
-		// 	.datum()
-		// 	.attr('class', 'area')
-		// 	.attr('d', area);
 		svgGroup
-			.append('path')
-			.datum(data)
-			.attr('class', 'line')
-			.attr('d', makeLinePath);
-
-		/* svgGroup
 			.selectAll('rect')
 			.data(data)
 			.enter()
@@ -159,7 +155,6 @@ class NumberOfTransmissionsGivenMutations extends React.Component {
 			.attr('width', xScale.bandwidth())
 			.attr('y', d => yScale(d.pOnly))
 			.attr('height', d => height - this.props.margin.bottom - this.props.margin.top - yScale(d.pOnly));
- */
 	}
 	render() {
 		return (
