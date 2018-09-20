@@ -75,14 +75,9 @@ class NumberOfTransmissionsGivenMutations extends React.Component {
 		// popuate data
 		// line chart based on http://bl.ocks.org/mbostock/3883245
 		const xScale = d3
-			.scaleBand()
+			.scaleLinear()
 			.range([this.props.margin.left, width - this.props.margin.left - this.props.margin.right])
-			.padding(0.1)
-			.domain(
-				data.map(function(d) {
-					return d.q;
-				})
-			);
+			.domain([0, d3.max(data.filter(d => d.pOnly > 0.001), d => d.q)]);
 
 		const yScale = d3
 			.scaleLinear()
@@ -96,7 +91,16 @@ class NumberOfTransmissionsGivenMutations extends React.Component {
 			.axisLeft()
 			.scale(yScale)
 			.ticks(5);
-
+		const makeLinePath = d3
+			.line()
+			.x(d => xScale(d.q))
+			.y(d => yScale(d.pOnly))
+			.curve(d3.curveStepAfter);
+		/* 		const area = d3
+			.area()
+			.x(d => xScale(d.q))
+			.y0(height - this.props.margin.bottom - this.props.margin.top)
+			.y1(d => yScale(d.pOnly)); */
 		//remove current plot
 		svg.selectAll('g').remove();
 		// do the drawing
@@ -134,7 +138,18 @@ class NumberOfTransmissionsGivenMutations extends React.Component {
 			.style('text-anchor', 'middle')
 			.text('Probability');
 
+		// svgGroup
+		// 	.append('path')
+		// 	.datum()
+		// 	.attr('class', 'area')
+		// 	.attr('d', area);
 		svgGroup
+			.append('path')
+			.datum(data)
+			.attr('class', 'line')
+			.attr('d', makeLinePath);
+
+		/* svgGroup
 			.selectAll('rect')
 			.data(data)
 			.enter()
@@ -144,6 +159,7 @@ class NumberOfTransmissionsGivenMutations extends React.Component {
 			.attr('width', xScale.bandwidth())
 			.attr('y', d => yScale(d.pOnly))
 			.attr('height', d => height - this.props.margin.bottom - this.props.margin.top - yScale(d.pOnly));
+ */
 	}
 	render() {
 		return (
