@@ -2,7 +2,7 @@
 	"name": "evolution-infection",
 	"version": "0.1.0",
 	"private": true,
-	"homepage": "https://jtmccr1.github.io/evolution-infection",
+	"homepage": "https://jtmccr1.github.io/estimate-number-of-transmission",
 	"dependencies": {
 		"d3": "^5.7.0",
 		"jStat": "^1.7.1",
