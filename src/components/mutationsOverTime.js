@@ -1,5 +1,8 @@
 import React from 'react';
 import * as d3 from 'd3';
+import * as R from 'ramda';
+import * as jStat from 'jStat';
+import { getData, drawAxis } from '../utils/commonFunctions';
 
 class MutationsPlot extends React.Component {
 	constructor(props) {
@@ -16,37 +19,21 @@ class MutationsPlot extends React.Component {
 
 	drawPlot() {
 		//Helper functions
-		let f = [];
-		const factorial = function(n) {
-			if (n === 0 || n === 1) return 1;
-			if (f[n] > 0) return f[n];
-			return (f[n] = factorial(n - 1) * n);
-		};
+
 		// from http://bl.ocks.org/mbostock/4349187 from https://github.com/rambaut/Probability-of-Difference/blob/gh-pages/index.html
 		// Sample from a normal distribution with mean 0, stddev 1.
-		const probabilityOfNumberOfChanges = function(mutations, days, genomeLength, ratePerSitePerYear) {
+		const probabilityOfNumberOfChanges = R.curry(function(days, genomeLength, ratePerSitePerYear, mutations) {
 			const averageChangesPerYear = ratePerSitePerYear * genomeLength;
 			const averageChangesPerDay = averageChangesPerYear / 365;
 			const averageChangesInDays = averageChangesPerDay * days;
-			const prob =
-				(Math.exp(-averageChangesInDays) * Math.pow(averageChangesInDays, mutations)) / factorial(mutations);
+			const prob = jStat.poisson.pdf(mutations, averageChangesInDays);
 			return prob;
-		};
-
-		const getData = function(data, genomeLength, ratePerSitePerYear, numberOfDays) {
-			let i = 0;
-			let needSomeDensity = true;
-			do {
-				const el = {
-					q: i,
-					p: probabilityOfNumberOfChanges(i, genomeLength, ratePerSitePerYear, numberOfDays),
-				};
-				data.push(el);
-				i++;
-				needSomeDensity = d3.max(data, d => d.p) < 0.001 ? true : false; // So we don't stop too soon
-			} while (data[i - 1].p > 0.001 || needSomeDensity);
-		};
-
+		});
+		const CurriedprobabilityOfNumberOfChanges = probabilityOfNumberOfChanges(
+			this.props.numberOfDays,
+			this.props.genomeLength,
+			this.props.evolutionaryRate
+		);
 		// draw the plot
 		const width = this.props.size[0];
 		const height = this.props.size[1];
@@ -54,9 +41,7 @@ class MutationsPlot extends React.Component {
 
 		const svg = d3.select(node).style('font', '10px sans-serif');
 
-		const data = [];
-
-		getData(data, this.props.genomeLength, this.props.evolutionaryRate, this.props.numberOfDays); // popuate data
+		const data = getData(CurriedprobabilityOfNumberOfChanges);
 
 		const xScale = d3
 			.scaleBand()
@@ -67,19 +52,10 @@ class MutationsPlot extends React.Component {
 					return d.q;
 				})
 			);
-
 		const yScale = d3
 			.scaleLinear()
 			.range([height - this.props.margin.top - this.props.margin.bottom, this.props.margin.bottom])
 			.domain([0, 1]);
-		const xAxis = d3
-			.axisBottom()
-			.scale(xScale)
-			.ticks(10);
-		const yAxis = d3
-			.axisLeft()
-			.scale(yScale)
-			.ticks(5);
 
 		//remove current plot
 		svg.selectAll('g').remove();
@@ -87,35 +63,9 @@ class MutationsPlot extends React.Component {
 		svg.append('g').attr('transform', `translate(${this.props.margin.left},${this.props.margin.top})`);
 
 		const svgGroup = svg.select('g');
-		svgGroup
-			.append('g')
-			.attr('class', 'x axis')
-			.attr('transform', `translate(0,${height - this.props.margin.top - this.props.margin.bottom} )`)
-			.call(xAxis);
-		// Add the text label for the x axis
-		svgGroup
-			.append('text')
-			.attr(
-				'transform',
-				`translate(${width / 2},${height - this.props.margin.top - this.props.margin.bottom + 30})`
-			)
-			.style('text-anchor', 'middle')
-			.text('Number of Mutations');
-		svgGroup
-			.append('g')
-			.attr('class', 'y axis')
-			.attr('transform', `translate(${this.props.margin.left},0)`)
-			.call(yAxis);
-		// Add the text label for the Y axis
-		svgGroup
-			.append('text')
-			.attr('transform', 'rotate(-90)')
-			.attr('y', this.props.margin.left - 45)
-			.attr('x', 0 - height / 2)
-			.attr('dy', '1em')
-			.style('text-anchor', 'middle')
-			.text('Probability');
 
+		drawAxis(svgGroup, xScale, yScale, this.props.size, this.props.margin, 'Number of Mutations', 'Probability');
+		// Add data
 		svgGroup
 			.selectAll('rect')
 			.data(data)

@@ -1,10 +1,11 @@
 {
-	"name": "evolution-infection",
+	"name": "estimate-number-of-transmission",
 	"version": "0.1.0",
 	"private": true,
 	"homepage": "https://jtmccr1.github.io/estimate-number-of-transmission",
 	"dependencies": {
 		"d3": "^5.7.0",
+		"gh-pages": "^2.0.0",
 		"jStat": "^1.7.1",
 		"mathjs": "^5.1.2",
 		"ramda": "^0.25.0",
@@ -13,14 +14,11 @@
 		"react-scripts": "1.1.5"
 	},
 	"scripts": {
+		"predeploy": "npm run build",
+		"deploy": "gh-pages -d build",
 		"start": "react-scripts start",
 		"build": "react-scripts build",
 		"test": "react-scripts test --env=jsdom",
-		"eject": "react-scripts eject",
-		"predeploy": "npm run build",
-		"deploy": "gh-pages -d build"
-	},
-	"devDependencies": {
-		"gh-pages": "^2.0.0"
+		"eject": "react-scripts eject"
 	}
 }

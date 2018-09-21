@@ -5,7 +5,7 @@ import DayPlot from './daysForMutations';
 import ProbabilityOfTransmission from './probabilityOfTransmission';
 import NumberOfTransmissions from './numberOfTransmissions';
 import NumberOfTransmissionsGivenMutations from './numberOfTransmissionsGivenMutations';
-import { pdfFunctions, cdfFunctions } from './pdf';
+import { pdfFunctions, cdfFunctions } from '../utils/commonFunctions';
 import '../style/App.css';
 import '../style/plots.css';
 

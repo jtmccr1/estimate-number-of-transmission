@@ -1,7 +1,7 @@
 import React from 'react';
 import * as d3 from 'd3';
 import * as R from 'ramda';
-import { numericalIntegration } from './pdf';
+import { getData, drawAxis } from '../utils/commonFunctions';
 
 class NumberOfTransmissions extends React.Component {
 	constructor(props) {
@@ -19,44 +19,33 @@ class NumberOfTransmissions extends React.Component {
 	drawPlot() {
 		//Helper functions
 		// The sum of 2 gamma distributions with the same rate parameter is a gamma distribution with shape a1+a2
-		function getData2(data, cdf, params, numberOfDays) {
-			data.push({
-				q: 0,
-				p: 1 - cdf(numberOfDays, params[0], params[1]),
-				pOnly: 1 - cdf(numberOfDays, params[0], params[1]),
-			});
-			let i = 1;
-			let needSomeDensity = true;
-			do {
-				const el = {
-					q: i,
-					p: cdf(numberOfDays, i * params[0], params[1]),
-				};
-				data.push(el);
-				i++;
-				needSomeDensity = d3.max(data, d => d.p) < 0.001 ? true : false; // So we don't stop too soon
-			} while (data[i - 1].p > 0.001 || needSomeDensity);
 
-			// Now fix so its the probably of exactly 1 or 2 ect.
-			let moreTransmission = 0;
-			for (let i = data.length - 1; i >= 1; --i) {
-				// The last one is fine (to approximation) as is the first one
-				data[i].pOnly = data[i].p - moreTransmission;
-				moreTransmission = moreTransmission + data[i].pOnly;
-			}
+		const curriedCdf = R.curry(function(cdf, params, numberOfDays, transmissions) {
+			return cdf(numberOfDays, transmissions * params[0], params[1]);
+		});
+		const waitingCdf = curriedCdf(this.props.cdf, this.props.params, this.props.numberOfDays);
+		let data = getData(waitingCdf, 1, 0.001, 1); //.filter(d => d.q > 0); // we need to set the 0 point as 1-cdf of at least 1;
+		data.push({
+			q: 0,
+			p: 1 - this.props.cdf(this.props.numberOfDays, this.props.params[0], this.props.params[1]),
+			pOnly: 1 - this.props.cdf(this.props.numberOfDays, this.props.params[0], this.props.params[1]),
+		});
+		data.sort((a, b) => a.q - b.q);
+		// Now we want probablity of only that many transmission events no at least this many
+
+		let moreTransmission = 0;
+		for (let i = data.length - 1; i >= 1; --i) {
+			// The last one is fine (to approximation) as is the first one
+			data[i].pOnly = data[i].p - moreTransmission;
+			moreTransmission = moreTransmission + data[i].pOnly;
 		}
+
 		// draw the plot
 		const width = this.props.size[0];
 		const height = this.props.size[1];
 		const node = this.node;
 
 		const svg = d3.select(node).style('font', '10px sans-serif');
-
-		const data = [];
-		getData2(data, this.props.cdf, this.props.params, this.props.numberOfDays);
-
-		// popuate data
-		// line chart based on http://bl.ocks.org/mbostock/3883245
 		const xScale = d3
 			.scaleBand()
 			.range([this.props.margin.left, width - this.props.margin.left - this.props.margin.right])
@@ -72,24 +61,6 @@ class NumberOfTransmissions extends React.Component {
 			.range([height - this.props.margin.top - this.props.margin.bottom, this.props.margin.bottom])
 			.domain([0, 1]); // d3.max(data, d => d.p)]);
 
-		// Max 30 ticks
-		//https://stackoverflow.com/questions/40924437/skipping-overlapping-labels-on-x-axis-for-a-barchart-in-dc-js
-		const stride = Math.ceil(data.length / 30);
-		const ticks = data
-			.filter(function(v, i) {
-				return i % stride === 0;
-			})
-			.map(d => d.q);
-
-		const xAxis = d3
-			.axisBottom()
-			.scale(xScale)
-			.tickValues(ticks);
-		const yAxis = d3
-			.axisLeft()
-			.scale(yScale)
-			.ticks(5);
-
 		//remove current plot
 		svg.selectAll('g').remove();
 		// do the drawing
@@ -97,35 +68,15 @@ class NumberOfTransmissions extends React.Component {
 
 		const svgGroup = svg.select('g');
 
-		svgGroup
-			.append('g')
-			.attr('class', 'x axis')
-			.attr('transform', `translate(0,${height - this.props.margin.top - this.props.margin.bottom} )`)
-			.call(xAxis);
-		// Add the text label for the x axis
-		svgGroup
-			.append('text')
-			.attr(
-				'transform',
-				`translate(${width / 2},${height - this.props.margin.top - this.props.margin.bottom + 30})`
-			)
-			.style('text-anchor', 'middle')
-			.text('Number transmission events');
-
-		svgGroup
-			.append('g')
-			.attr('class', 'y axis')
-			.attr('transform', `translate(${this.props.margin.left},0)`)
-			.call(yAxis);
-		// Add the text label for the Y axis
-		svgGroup
-			.append('text')
-			.attr('transform', 'rotate(-90)')
-			.attr('y', this.props.margin.left - 60)
-			.attr('x', 0 - height / 2)
-			.attr('dy', '1em')
-			.style('text-anchor', 'middle')
-			.text('Probability');
+		drawAxis(
+			svgGroup,
+			xScale,
+			yScale,
+			this.props.size,
+			this.props.margin,
+			'Number of transmission events',
+			'Probability'
+		);
 
 		svgGroup
 			.selectAll('rect')
