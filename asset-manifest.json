@@ -1,6 +1,22 @@
 {
-  "main.css": "static/css/main.32c352a2.css",
-  "main.css.map": "static/css/main.32c352a2.css.map",
-  "main.js": "static/js/main.f80775ec.js",
-  "main.js.map": "static/js/main.f80775ec.js.map"
+  "files": {
+    "main.css": "/estimate-number-of-transmission/static/css/main.4209cd48.chunk.css",
+    "main.js": "/estimate-number-of-transmission/static/js/main.2bf4d7a9.chunk.js",
+    "main.js.map": "/estimate-number-of-transmission/static/js/main.2bf4d7a9.chunk.js.map",
+    "runtime-main.js": "/estimate-number-of-transmission/static/js/runtime-main.d9020be5.js",
+    "runtime-main.js.map": "/estimate-number-of-transmission/static/js/runtime-main.d9020be5.js.map",
+    "static/js/2.90e71397.chunk.js": "/estimate-number-of-transmission/static/js/2.90e71397.chunk.js",
+    "static/js/2.90e71397.chunk.js.map": "/estimate-number-of-transmission/static/js/2.90e71397.chunk.js.map",
+    "index.html": "/estimate-number-of-transmission/index.html",
+    "precache-manifest.576dfca0f8813b93f9b74459f61d6ae3.js": "/estimate-number-of-transmission/precache-manifest.576dfca0f8813b93f9b74459f61d6ae3.js",
+    "service-worker.js": "/estimate-number-of-transmission/service-worker.js",
+    "static/css/main.4209cd48.chunk.css.map": "/estimate-number-of-transmission/static/css/main.4209cd48.chunk.css.map",
+    "static/js/2.90e71397.chunk.js.LICENSE.txt": "/estimate-number-of-transmission/static/js/2.90e71397.chunk.js.LICENSE.txt"
+  },
+  "entrypoints": [
+    "static/js/runtime-main.d9020be5.js",
+    "static/js/2.90e71397.chunk.js",
+    "static/css/main.4209cd48.chunk.css",
+    "static/js/main.2bf4d7a9.chunk.js"
+  ]
 }
