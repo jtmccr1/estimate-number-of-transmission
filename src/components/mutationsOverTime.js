@@ -76,12 +76,14 @@ class MutationsPlot extends React.Component {
 			.attr('width', xScale.bandwidth())
 			.attr('y', d => yScale(d.p))
 			.attr('height', d => height - this.props.margin.bottom - this.props.margin.top - yScale(d.p));
+		svgGroup.append("text")
+			.classed("title",true)
+			.text(`Mutations in ${this.props.numberOfDays} day(s)`)
 	}
 	render() {
 		return (
 			<div>
-				<div>{`The number of expected mutations in ${this.props.numberOfDays} day(s)`}</div>
-				<svg ref={node => (this.node = node)} width={this.props.size[0]} height={this.props.size[1]} />
+				<svg ref={node => (this.node = node)} viewBox={ `0 0 ${this.props.size[0]} ${this.props.size[1]}`} />
 			</div>
 		);
 	}

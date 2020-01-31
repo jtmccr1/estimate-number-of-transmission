@@ -14,8 +14,8 @@ class App extends Component {
 		super(props);
 		this.updateOnSelection = this.updateOnSelection.bind(this);
 		this.state = {
-			evolutionaryRate: 0.001,
-			genomeLength: 13000,
+			evolutionaryRate: 0.0009,
+			genomeLength: 30000,
 			conditionalOptions: ['Number of Mutations', 'Number of Days'],
 			selectedOption: 'Number of Mutations',
 			numberOfMutations: 1,
@@ -41,7 +41,7 @@ class App extends Component {
 		return (
 			<div>
 				<div className="container">
-					<div>
+					<div >
 						<Selectors
 							evolutionaryRate={this.state.evolutionaryRate}
 							updater={this.updateOnSelection}
@@ -55,31 +55,9 @@ class App extends Component {
 							distributionParameters={this.state.distributionParameters}
 						/>
 					</div>
-
-					{this.state.selectedOption === 'Number of Mutations' ? (
-						<div>
-							<DayPlot
-								size={[700, 500]}
-								margin={{ top: 50, right: 50, bottom: 50, left: 50 }}
-								genomeLength={this.state.genomeLength}
-								evolutionaryRate={this.state.evolutionaryRate}
-								numberOfMutations={this.state.numberOfMutations}
-							/>
-						</div>
-					) : (
-						<div>
-							<MutationsPlot
-								size={[700, 500]}
-								margin={{ top: 50, right: 50, bottom: 50, left: 50 }}
-								genomeLength={this.state.genomeLength}
-								evolutionaryRate={this.state.evolutionaryRate}
-								numberOfDays={this.state.numberOfDays}
-							/>
-						</div>
-					)}
-					<div>
+					<div className={"plot"}>
 						<ProbabilityOfTransmission
-							size={[700, 500]}
+							size={[400, 500]}
 							margin={{ top: 50, right: 50, bottom: 50, left: 50 }}
 							params={this.state.distributionParameters}
 							pdf={pdfFunctions[this.state.distributionSelection]}
@@ -87,13 +65,33 @@ class App extends Component {
 							fixOn={this.state.selectedOption}
 						/>
 					</div>
-				</div>
-				<div className="container">
-					<div />
+					{this.state.selectedOption === 'Number of Mutations' ? (
+						<div className={"plot"}>
+							<DayPlot
+								size={[400, 500]}
+								margin={{ top: 50, right: 50, bottom: 50, left: 50 }}
+								genomeLength={this.state.genomeLength}
+								evolutionaryRate={this.state.evolutionaryRate}
+								numberOfMutations={this.state.numberOfMutations}
+							/>
+						</div>
+					) : (
+						<div className={"plot"}>
+							<MutationsPlot
+								size={[400, 500]}
+								margin={{ top: 50, right: 50, bottom: 50, left: 50 }}
+								genomeLength={this.state.genomeLength}
+								evolutionaryRate={this.state.evolutionaryRate}
+								numberOfDays={this.state.numberOfDays}
+							/>
+						</div>
+					)}
+
+
 					{this.state.selectedOption === 'Number of Days' ? (
-						<div>
+						<div className={"plot"}>
 							<NumberOfTransmissions
-								size={[700, 500]}
+								size={[400, 500]}
 								margin={{ top: 50, right: 50, bottom: 50, left: 50 }}
 								params={this.state.distributionParameters}
 								cdf={cdfFunctions[this.state.distributionSelection]}
@@ -101,10 +99,10 @@ class App extends Component {
 							/>
 						</div>
 					) : (
-						<div>
+						<div className={"plot"}>
 							<NumberOfTransmissionsGivenMutations
-								size={[700, 500]}
-								margin={{ top: 50, right: 50, bottom: 50, left: 50 }}
+								size={[400, 500]}
+									margin={{ top: 50, right: 50, bottom: 50, left: 50 }}
 								params={this.state.distributionParameters}
 								genomeLength={this.state.genomeLength}
 								evolutionaryRate={this.state.evolutionaryRate}

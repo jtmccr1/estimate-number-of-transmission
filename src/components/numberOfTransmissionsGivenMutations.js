@@ -53,7 +53,6 @@ class NumberOfTransmissionsGivenMutations extends React.Component {
 			moreTransmission = moreTransmission + data[i].pOnly;
 		}
 		data.pop(); // the last point is overestimated anyway
-
 		// draw the plot
 		const width = this.props.size[0];
 		const height = this.props.size[1];
@@ -103,16 +102,19 @@ class NumberOfTransmissionsGivenMutations extends React.Component {
 			this.props.size,
 			this.props.margin,
 			'Number of transmission events',
-			'Probability'
+			'Probability',
+			xScale.domain().filter((d,i)=>!(i%5))
 		);
+
+		svgGroup.append("text")
+			.classed("title",true)
+			.text(`Transmission events for ${this.props.numberOfMutations} mutation(s)`)
 	}
 	render() {
 		return (
 			<div>
-				<div>{`The number of transmission events expected given ${
-					this.props.numberOfMutations
-				} mutations`}</div>
-				<svg ref={node => (this.node = node)} width={this.props.size[0]} height={this.props.size[1]} />
+
+				<svg ref={node => (this.node = node)} viewBox={ `0 0 ${this.props.size[0]} ${this.props.size[1]}`} />
 			</div>
 		);
 	}

@@ -36,10 +36,20 @@
 	flex-direction: row;
 	padding-left: 1%;
 	padding-top: 5%;
+	flex-wrap: nowrap;
+	justify-content: flex-start
 }
+
 .box :first-child {
 	width: 500px;
 }
-.container > div {
-	flex-grow: 1; /*grow*/
+/*.container > div {*/
+/*	flex-grow: 1; !*grow*!*/
+/*}*/
+.plot{
+	flex-basis:25%;
+}
+text.title{
+	font-size: 12pt;
+	font-weight: 300;
 }

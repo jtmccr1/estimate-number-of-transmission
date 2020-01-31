@@ -73,12 +73,15 @@ class DayPlot extends React.Component {
 			.datum(data)
 			.attr('class', 'line')
 			.attr('d', makeLinePath);
+
+		svgGroup.append("text")
+			.classed("title",true)
+			.text(`Days to ${this.props.numberOfMutations} mutation(s)`)
 	}
 	render() {
 		return (
 			<div>
-				<div>{`The distribution of days given ${this.props.numberOfMutations} mutation(s)`}</div>
-				<svg ref={node => (this.node = node)} width={this.props.size[0]} height={this.props.size[1]} />
+				<svg ref={node => (this.node = node)} viewBox={ `0 0 ${this.props.size[0]} ${this.props.size[1]}`} />
 			</div>
 		);
 	}

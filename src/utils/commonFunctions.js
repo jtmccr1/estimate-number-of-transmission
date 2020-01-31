@@ -41,16 +41,30 @@ export const getData = (curriedF, xStep = 1, minP = 0.001, initial = 0) => {
 	return data;
 };
 
-export const drawAxis = (svgGroup, xScale, yScale, size, margins, xlab, ylab) => {
+export const drawAxis = (svgGroup, xScale, yScale, size, margins, xlab, ylab,tickvalues=null) => {
 	//Make axis
-	const xAxis = d3
+	let xAxis,yAxis
+	if(tickvalues!==null){ // hacky hack hack
+	 xAxis = d3
 		.axisBottom()
 		.scale(xScale)
-		.ticks(10);
-	const yAxis = d3
+		.ticks(5)
+		 .tickValues(tickvalues);
+	 yAxis = d3
 		.axisLeft()
 		.scale(yScale)
 		.ticks(5);
+	}
+	else{
+		xAxis = d3
+			.axisBottom()
+			.scale(xScale)
+			.ticks(5);
+		yAxis = d3
+			.axisLeft()
+			.scale(yScale)
+			.ticks(5);
+	}
 	// draw Axis
 	svgGroup
 		.append('g')

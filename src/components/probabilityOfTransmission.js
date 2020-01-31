@@ -28,7 +28,7 @@ class ProbabilityOfTransmission extends React.Component {
 		const svg = d3.select(node).style('font', '10px sans-serif');
 
 		const data = getData(curriedPdf(R.__, ...this.props.params), 0.01).filter(d => isFinite(d.p));
-		// popuate data
+		// populate data
 		// line chart based on http://bl.ocks.org/mbostock/3883245
 		const xScale = d3
 			.scaleLinear()
@@ -79,12 +79,17 @@ class ProbabilityOfTransmission extends React.Component {
 			.datum(data)
 			.attr('class', 'line')
 			.attr('d', makeLinePath);
+
+		svgGroup.append("text")
+			.classed("title",true)
+			.text(`Serial Interval`)
+
 	}
 	render() {
 		return (
 			<div>
-				<div>{`The probability of transmission over time (serial interval)`}</div>
-				<svg ref={node => (this.node = node)} width={this.props.size[0]} height={this.props.size[1]} />
+
+				<svg ref={node => (this.node = node)} viewBox={ `0 0 ${this.props.size[0]} ${this.props.size[1]}`} />
 			</div>
 		);
 	}

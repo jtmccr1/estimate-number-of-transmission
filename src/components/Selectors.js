@@ -9,7 +9,7 @@ const Selectors = props => {
 	));
 	const mutationOptions = {
 		min: 1,
-		max: 20,
+		max: 10,
 		step: 1,
 		name: 'Number of mutations observed',
 		label: `Number of mutations : ${props.numberOfMutations}`,
@@ -64,9 +64,9 @@ const Selectors = props => {
 		],
 		Gamma: [
 			{
-				min: 0.1,
-				max: 10,
-				step: 0.1,
+				min: 1,
+				max: 4,
+				step: 0.5,
 				name: 'shape1',
 				label: `shape1: ${props.distributionParameters[0]}`,
 				value: props.distributionParameters[0],
@@ -75,9 +75,9 @@ const Selectors = props => {
 				index: 0,
 			},
 			{
-				min: 0.1,
-				max: 10,
-				step: 0.1,
+				min: 1,
+				max: 5,
+				step: 0.5,
 				name: 'scale',
 				label: `scale: ${props.distributionParameters[1]}`,
 				value: props.distributionParameters[1],
@@ -108,7 +108,7 @@ const Selectors = props => {
 			/>
 			<Sliderselector
 				min={10000}
-				max={30000}
+				max={32000}
 				step={50}
 				name={'Genome Length'}
 				label={`Genome Length: ${props.genomeLength / 1000} Kb`}

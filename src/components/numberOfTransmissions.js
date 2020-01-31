@@ -75,7 +75,8 @@ class NumberOfTransmissions extends React.Component {
 			this.props.size,
 			this.props.margin,
 			'Number of transmission events',
-			'Probability'
+			'Probability',
+			xScale.domain().filter((d,i)=>!(i%2))
 		);
 
 		svgGroup
@@ -88,12 +89,15 @@ class NumberOfTransmissions extends React.Component {
 			.attr('width', xScale.bandwidth())
 			.attr('y', d => yScale(d.pOnly))
 			.attr('height', d => height - this.props.margin.bottom - this.props.margin.top - yScale(d.pOnly));
+
+		svgGroup.append("text")
+			.classed("title",true)
+			.text(`Transmission events in ${this.props.numberOfDays} days`)
 	}
 	render() {
 		return (
 			<div>
-				<div>{`The number of transmission events expected in ${this.props.numberOfDays} days`}</div>
-				<svg ref={node => (this.node = node)} width={this.props.size[0]} height={this.props.size[1]} />
+				<svg ref={node => (this.node = node)} viewBox={ `0 0 ${this.props.size[0]} ${this.props.size[1]}`} />
 			</div>
 		);
 	}
