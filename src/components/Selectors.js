@@ -65,7 +65,7 @@ const Selectors = props => {
 		Gamma: [
 			{
 				min: 1,
-				max: 4,
+				max: 3,
 				step: 0.5,
 				name: 'shape1',
 				label: `shape1: ${props.distributionParameters[0]}`,
