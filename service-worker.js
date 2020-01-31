@@ -14,7 +14,7 @@
 importScripts("https://storage.googleapis.com/workbox-cdn/releases/4.3.1/workbox-sw.js");
 
 importScripts(
-  "/estimate-number-of-transmission/precache-manifest.42d30a86df1a292bf2ebb00d8ea16cd1.js"
+  "/estimate-number-of-transmission/precache-manifest.c092a30a30eb7b4a20efb8e9e699e53d.js"
 );
 
 self.addEventListener('message', (event) => {
