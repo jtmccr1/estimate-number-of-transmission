@@ -109,7 +109,7 @@ class NumberOfTransmissionsGivenMutations extends React.Component {
 	render() {
 		return (
 			<div>
-				<div>{`The probability number of transmission events expected given ${
+				<div>{`The number of transmission events expected given ${
 					this.props.numberOfMutations
 				} mutations`}</div>
 				<svg ref={node => (this.node = node)} width={this.props.size[0]} height={this.props.size[1]} />

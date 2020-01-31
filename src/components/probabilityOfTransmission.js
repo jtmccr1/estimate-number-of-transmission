@@ -83,7 +83,7 @@ class ProbabilityOfTransmission extends React.Component {
 	render() {
 		return (
 			<div>
-				<div>{`The probability of Transmission over time`}</div>
+				<div>{`The probability of transmission over time (serial interval)`}</div>
 				<svg ref={node => (this.node = node)} width={this.props.size[0]} height={this.props.size[1]} />
 			</div>
 		);

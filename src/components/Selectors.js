@@ -122,7 +122,7 @@ const Selectors = props => {
 				{options}
 			</select>
 			<Sliderselector {...mutationDayOptions} />
-			<label>Transmission Distribution</label>
+			<label>Probability of transmission overtime</label>
 
 			<select
 				value={props.distributionSelection}

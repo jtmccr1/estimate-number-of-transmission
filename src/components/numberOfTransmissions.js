@@ -92,7 +92,7 @@ class NumberOfTransmissions extends React.Component {
 	render() {
 		return (
 			<div>
-				<div>{`The probability number of transmission events expected in ${this.props.numberOfDays} days`}</div>
+				<div>{`The number of transmission events expected in ${this.props.numberOfDays} days`}</div>
 				<svg ref={node => (this.node = node)} width={this.props.size[0]} height={this.props.size[1]} />
 			</div>
 		);
